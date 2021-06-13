@@ -1,3 +1,6 @@
+# Dependences:
+# youtube-dl, cutycapt, jq, wc, rar, curl, iconv, python
+
 # INSTALL
 cp {telegram_send.sh,telegram_main.sh,telegram_youtube_dl.sh} /bin
 echo 'TOKEN="YOUR_TOKEN"' > /etc/telegram_bot.conf;
