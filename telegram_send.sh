@@ -10,10 +10,10 @@ msg="$(echo "$1" | $SED 's/%0A/\n/g')";
 [[ "$2" =~ ^[0-9]+$ ]] && CID="$2" || attach="$2";
 [[ "$3" =~ ^[0-9]+$ ]] && CID="$3" || attachs=${@:3};
 
-if [[ "a$attach" != "a" ]]; then
+if [[ -n $attach ]]; then
     URL="https://api.telegram.org/$TOKEN/sendDocument";
-    $CURL -A "$UA" -F chat_id=$CID -F document=@"$attach" -F caption="$msg" "$URL"
-    if [[ "a$attachs" != "a" ]]; then
+    $CURL -A "$UA" -F chat_id="$CID" -F document=@"$attach" -F caption="$msg" "$URL"
+    if [[ -n $attachs ]]; then
         for i in $attachs; do
             $CURL -s -A "$UA" -F chat_id="$CID" -F document=@"$i" "$URL";
         done
