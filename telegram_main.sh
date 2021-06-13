@@ -33,15 +33,14 @@ echo "$$" > "$PID_FILE";
 
 function _help(){
     ADMIN="$1"; HELP="";
+    HELP="$HELP/help - показать эту справку%0A";
     HELP="$HELP/joke - случайный анекдот%0A";
     HELP="$HELP/weather - погода%0A";
-    [[ "$ADMIN" == "true" ]] &&
-        HELP="$HELP/exec cmd - выполнение произвольной команды (без root)%0A";
-    [[ "$ADMIN" == "true" ]] && HELP="$HELP/new_emails - проверка новой почты%0A";
     HELP="$HELP/youtube_dl - Download from youtube%0A";
     HELP="$HELP/youtube_dl_list count=N page=N query%0A";
     HELP="$HELP/youtube_dl_cancel - cancel all downloads%0A";
-    HELP="$HELP/help - показать эту справку";
+    [[ "$ADMIN" == "true" ]] && HELP="$HELP/exec cmd - выполнение произвольной команды (без root)%0A";
+    [[ "$ADMIN" == "true" ]] && HELP="$HELP/new_emails - проверка новой почты";
     $TELEGRAM_SEND "$HELP" "$FROM_ID";
 }
 
@@ -62,7 +61,7 @@ function new_emails(){
         pass="_TOP_SECRET_";
         NEWEMAIL_LST="/tmp/new_emails.png";
         URL="https://mail.pogoreliy.tk/new_msg.php?html=true&password=$pass";
-        $CUTYCAPT --url="$URL" --out=$NEWEMAIL_LST;
+        $CUTYCAPT --url="$URL" --out="$NEWEMAIL_LST";
         $TELEGRAM_SEND "New email list" "$NEWEMAIL_LST" "$FROM_ID";
         $RM "$NEWEMAIL_LST";
     else
@@ -79,7 +78,7 @@ function weather(){
     U2="bee83c0f4aa7de0d4905a612d06d3af59c";
     U3="c13086efe66a4db3537d88c2a46cca";
     URL="$U1$U2$U3";
-    $CUTYCAPT --url="$URL" --out=$WTH;
+    $CUTYCAPT --url="$URL" --out="$WTH";
     $TELEGRAM_SEND "Погода" "$WTH" "$FROM_ID";
     cd; $RM -R "/tmp/weather_$FROM_ID";
 }
@@ -95,34 +94,33 @@ function youtube_dl_cancel(){
 function joke(){
     FROM_ID="$1";
     RES="$($CURL -s "http://rzhunemogu.ru/RandJSON.aspx?CType=1" |
-           $ICONV -f windows-1251 -t utf-8 | $SED 's/{\"content\":\"\|\"}//g')";
+               $ICONV -f windows-1251 -t utf-8 | $SED 's/{\"content\":\"\|\"}//g')";
     $TELEGRAM_SEND "$RES" "$FROM_ID";
 }
 
 . /etc/telegram_bot.conf;
 
 while true; do
-    [[ "$FROM_ID" == "_TOP_SECRET_" ]] && ADMIN="true" || ADMIN="false";
-    URL="https://api.telegram.org/$TOKEN/getUpdates";
-    RES="$($CURL -s -F offset=-1 $URL | $JQ ".result[] | .message.message_id,
-                                           .message.from.id, .message.text")";
+    url="https://api.telegram.org/$TOKEN/getUpdates";
+    RES="$($CURL -s -F offset=-1 $url | $JQ ".result[] | .message.message_id,
+                                                                            .message.from.id, .message.text")";
     ID="$(echo "$RES" | $HEAD -n1)";
     FROM_ID="$(echo "$RES" | $HEAD -n2 | $TAIL -n1)";
+    [[ "$FROM_ID" == "_SECRET_" ]] && ADMIN="true" || ADMIN="false";
     TEXT="$(echo "$RES" | $TAIL -n1 | $SED 's/^\"\|\"$//g')";
-    TEXT="$($PYTHON -c "print(u'$TEXT')")"; # TO CORRECTLY PARSE THE CYRILLIC
+    TEXT="$($PYTHON -c "print(u'$TEXT')")"; # FOR CORRECTLY PARSE THE CYRILLIC
 
     if ! $GREP -Pq "$ID" "$TELEGRAM_BOT_LOG"; then
         case "$TEXT" in
             /help*|/start*) _help "$ADMIN" "$FROM_ID";;
-            /exec*)_exec "$ADMIN" "$TEXT" "$FROM_ID";;
+            /exec*) _exec "$ADMIN" "$TEXT" "$FROM_ID";;
             /new_emails) new_emails "$ADMIN" "$FROM_ID";;
             /joke) joke "$FROM_ID";;
             /weather) weather "$FROM_ID";;
             /youtube_dl_cancel*) youtube_dl_cancel "$FROM_ID";;
             /youtube_dl_list*) $TELEGRAM_YOUTUBE_DL "list" "$TEXT" "$FROM_ID" &;;
-            /youtube_dl*)
-                URL="$(echo "$TEXT" | $SED 's/^\/youtube_dl *//g')";
-                $TELEGRAM_YOUTUBE_DL "$URL" "$FROM_ID" &;;
+            /youtube_dl*) URL="$(echo "$TEXT" | $SED 's/^\/youtube_dl *//g')";
+                                   $TELEGRAM_YOUTUBE_DL "$URL" "$FROM_ID" &;;
         esac
         # может не работать в некоторых системах
         # я выбрал вариант, который отнимает меньше системных ресурсов
@@ -132,7 +130,7 @@ while true; do
         # I chose the one that requires less system resources
         # if it does not work correctly, you can use ls and awk
         # or refer to the man page of your distribution
-        if [[ "$($STAT --printf="%s" "$TELEGRAM_BOT_LOG")" -ge "5120" ]]; then
+        if [[ "$($STAT --printf="%s" "$TELEGRAM_BOT_LOG")" -ge "5120" ]]; then # if size >= 5 Kbyte
             echo "$ID" > "$TELEGRAM_BOT_LOG";
         else
             echo "$ID" >> "$TELEGRAM_BOT_LOG";
