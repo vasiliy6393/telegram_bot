@@ -43,7 +43,7 @@ else
     FILE_EXP="$(echo "$FILE" | $SED 's/.*\.\([a-zA-Z0-9]\+\)$/\1/')";
     FILE_SIZE="$($LS -l "$FILENAME.$FILE_EXP" | awk '{print $5}')";
     
-    if [[ "$FILE_SIZE" -ge "50331648" ]]; then # max attach size = 48 Mbyte
+    if [[ "$FILE_SIZE" -ge "50331648" ]]; then # if attach size >= 48 Mbyte
         INPUT="$FILENAME.$FILE_EXP";
         NEW_NAME="$(echo "$FILENAME" | sed 's/[\,]//g' | grep -Po '^.{0,25}')";
         OUTPUT="$NEW_NAME.rar";
