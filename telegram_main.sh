@@ -86,7 +86,7 @@ function weather(){
 function youtube_dl_cancel(){
     FROM_ID="$1";
     PID_YOUTUBE_DL=$(ps aux | $GREP -P 'telegram_youtube_dl.sh' |
-                              $GREP -P "$FROM_ID" | $AWK '{print $2}');
+                                           $GREP -P "$FROM_ID" | $AWK '{print $2}');
     [[ -n "$PID_YOUTUBE_DL" ]] && $KILL -9 $PID_YOUTUBE_DL;
     $RM -R "/tmp/youtube_dl_$FROM_ID";
 }
