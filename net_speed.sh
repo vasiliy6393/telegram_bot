@@ -5,7 +5,7 @@ AWK="$(which awk)";
 IFCONFIG="$(which ifconfig)";
 IFACE="ppp0"; n=0; s=0; p=0;
 
-while true; do
+for i in {1..2}; do
     p="$s";
     s="$($IFCONFIG $IFACE | $GREP -P 'RX.*bytes' | $AWK '{print $5}')";
     if [[ "a$p" != "a0" ]]; then
