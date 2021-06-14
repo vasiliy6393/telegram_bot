@@ -1,7 +1,7 @@
 #  AUTHOR: Vasiliy Pogoreliy, vasiliy@pogoreliy.tk 
 
 # Dependences:
-# youtube-dl, cutycapt, jq, wc, rar, curl, iconv, python, net-tools
+# youtube-dl, cutycapt, jq, wc, rar, curl, iconv, python, net-tools, coreutils
 
 # INSTALL
 cp ./*.sh /bin; # or /usr/bin or /usr/local/bin
