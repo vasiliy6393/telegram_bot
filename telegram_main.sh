@@ -25,7 +25,7 @@ export RAR="$(which rar)";
 export ICONV="$(which iconv)";
 export PYTHON="$(which python)";
 
-PID_FILE="/tmp/telegram_cmd.pid";
+PID_FILE="/tmp/telegram_bot.pid";
 if [[ -e "$PID_FILE" ]]; then
     LAST_PID="$($CAT "$PID_FILE")";
     [[ "$LAST_PID" =~ ^[0-9]+$ ]] && $KILL -9 $LAST_PID;
