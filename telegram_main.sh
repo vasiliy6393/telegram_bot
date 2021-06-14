@@ -3,6 +3,7 @@
 export TELEGRAM_BOT_LOG="/var/log/telegram_bot.log";
 export TELEGRAM_SEND="$(which telegram_send.sh)";
 export TELEGRAM_YOUTUBE_DL="$(which telegram_youtube_dl.sh)";
+export NET_SPEED="$(which net_speed.sh)";
 export CUTYCAPT="$(which cutycapt)";
 export YOUTUBEDL="$(which youtube-dl)";
 export MKDIR="$(which mkdir)";
@@ -41,6 +42,7 @@ function _help(){
     HELP="$HELP/youtube_dl_cancel - cancel all downloads%0A";
     [[ "$ADMIN" == "true" ]] && HELP="$HELP/exec cmd - выполнение произвольной команды (без root)%0A";
     [[ "$ADMIN" == "true" ]] && HELP="$HELP/new_emails - проверка новой почты";
+    [[ "$ADMIN" == "true" ]] && HELP="$HELP/net_speed - узнать текущую скорость интернет%0A";
     $TELEGRAM_SEND "$HELP" "$FROM_ID";
 }
 
@@ -52,6 +54,12 @@ function _exec(){
     else
         $TELEGRAM_SEND "Permission denied" "$FROM_ID";
     fi
+}
+
+function net_speed(){
+    ADMIN="$1"; FROM_ID="$2";
+    [[ "$ADMIN" == "true" ]] && $TELEGRAM_BOT "$($NET_SPEED)" "$FROM_ID" ||
+                                                     $TELEGRAM_BOT "Permission denied" "$FROM_ID";
 }
 
 function new_emails(){
@@ -111,9 +119,13 @@ while true; do
     TEXT="$($PYTHON -c "print(u'$TEXT')")"; # FOR CORRECTLY PARSE THE CYRILLIC
 
     if ! $GREP -Pq "$ID" "$TELEGRAM_BOT_LOG"; then
+        # начало регистро-независимого сравнения
+        # start of register-independent string comparison
+        shopt -s nocasematch;
         case "$TEXT" in
             /help*|/start*) _help "$ADMIN" "$FROM_ID";;
             /exec*) _exec "$ADMIN" "$TEXT" "$FROM_ID";;
+            /net_speed*) net_speed "$ADMIN" "$FROM_ID";;
             /new_emails) new_emails "$ADMIN" "$FROM_ID";;
             /joke) joke "$FROM_ID";;
             /weather) weather "$FROM_ID";;
@@ -122,6 +134,9 @@ while true; do
             /youtube_dl*) URL="$(echo "$TEXT" | $SED 's/^\/youtube_dl *//g')";
                                    $TELEGRAM_YOUTUBE_DL "$URL" "$FROM_ID" &;;
         esac
+        # конец регистро-независимого сравнения
+        # end of register-independent string comparison
+        shopt -u nocasematch;
         # может не работать в некоторых системах
         # я выбрал вариант, который отнимает меньше системных ресурсов
         # если не работает, можно использовать связку ls и awk
