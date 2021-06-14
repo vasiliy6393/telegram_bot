@@ -1,12 +1,12 @@
 #  AUTHOR: Vasiliy Pogoreliy, vasiliy@pogoreliy.tk 
 
 # Dependences:
-# youtube-dl, cutycapt, jq, wc, rar, curl, iconv, python
+# youtube-dl, cutycapt, jq, wc, rar, curl, iconv, python, net-tools
 
 # INSTALL
-cp {telegram_send.sh,telegram_main.sh,telegram_youtube_dl.sh} /bin
+cp ./*.sh /bin; # or /usr/bin or /usr/local/bin
 echo 'TOKEN="YOUR_TOKEN"' > /etc/telegram_bot.conf;
 echo 'CID="YOUR_CID"' >> /etc/telegram_bot.conf;
 touch /var/log/telegram_bot.log;
 chown YOUR_NAME:YOUR_GROUP /var/log/telegram_bot.log;
-# Place telegram_main.sh in autostart with regular user privileges
+# Place telegram_main.sh in autostart with regular (not root) user
