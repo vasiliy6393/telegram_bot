@@ -7,6 +7,8 @@ export NET_SPEED="$(which net_speed.sh)";
 export CUTYCAPT="$(which cutycapt)";
 export YOUTUBEDL="$(which youtube-dl)";
 export MKDIR="$(which mkdir)";
+export SORT="$(which sort)";
+export UNIQ="$(which uniq)";
 export KILL="$(which kill)";
 export CAT="$(which cat)";
 export JQ="$(which jq)";
@@ -63,17 +65,18 @@ function net_speed(){
 }
 
 function new_emails(){
-    ADMIN="$1";
-    FROM_ID="$2";
+    ADMIN="$1"; FROM_ID="$2";
     if [[ "$ADMIN" == "true" ]]; then
         pass="_TOP_SECRET_";
-        NEWEMAIL_LST="/tmp/new_emails.png";
         URL="https://mail.pogoreliy.tk/new_msg.php?html=true&password=$pass";
-        $CUTYCAPT --url="$URL" --out="$NEWEMAIL_LST";
-        $TELEGRAM_SEND "New email list" "$NEWEMAIL_LST" "$FROM_ID";
-        $RM "$NEWEMAIL_LST";
+        $CURL "$URL" | grep -Po '\?id=[^&]+' | $AWK -F= '{print $2}' | $SORT | $UNIQ |
+        while read email_id; do
+            $CURL -s "https://mail.pogoreliy.tk/$SECRET_PAGE?id=$email_id" > "/tmp/new_mail_$email_id.html";
+            $TELEGRAM_BOT "New email:" "/tmp/new_mail_$email_id.html" "$FROM_ID";
+            $RM "/tmp/new_mail_$email_id.html";
+        done
     else
-        $TELEGRAM_SEND "Permission denied" "$FROM_ID";
+        $TELEGRAM_BOT "Permission denied" "$FROM_ID";
     fi
 }
 
