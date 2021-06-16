@@ -69,7 +69,7 @@ function new_emails(){
     if [[ "$ADMIN" == "true" ]]; then
         pass="_TOP_SECRET_";
         URL="https://mail.pogoreliy.tk/new_msg.php?html=true&password=$pass";
-        $CURL "$URL" | grep -Po '\?id=[^&]+' | $AWK -F= '{print $2}' | $SORT | $UNIQ |
+        $CURL "$URL" | $GREP -Po '\?id=[^&]+' | $AWK -F= '{print $2}' | $SORT | $UNIQ |
         while read email_id; do
             $CURL -s "https://mail.pogoreliy.tk/$SECRET_PAGE?id=$email_id" > "/tmp/new_mail_$email_id.html";
             $TELEGRAM_BOT "New email:" "/tmp/new_mail_$email_id.html" "$FROM_ID";
