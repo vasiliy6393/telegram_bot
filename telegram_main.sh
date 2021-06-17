@@ -6,6 +6,7 @@ export TELEGRAM_YOUTUBE_DL="$(which telegram_youtube_dl.sh)";
 export NET_SPEED="$(which net_speed.sh)";
 export CUTYCAPT="$(which cutycapt)";
 export YOUTUBEDL="$(which youtube-dl)";
+export TRANS="$(which trans)";
 export MKDIR="$(which mkdir)";
 export SORT="$(which sort)";
 export UNIQ="$(which uniq)";
@@ -39,6 +40,8 @@ function _help(){
     HELP="$HELP/help - показать эту справку%0A";
     HELP="$HELP/joke - случайный анекдот%0A";
     HELP="$HELP/weather - погода%0A";
+    HELP="$HELP/translate_en_ru - переводчик с английского на русский%0A";
+    HELP="$HELP/translate_ru_en - переводчик с русского на английский%0A";
     HELP="$HELP/youtube_dl - Download from youtube%0A";
     HELP="$HELP/youtube_dl_list count=N page=N query%0A";
     HELP="$HELP/youtube_dl_cancel - cancel all downloads%0A";
@@ -94,6 +97,12 @@ function weather(){
     cd; $RM -R "/tmp/weather_$FROM_ID";
 }
 
+function translate(){
+    TEXT="$1"; LANG="$2"; FROM_ID="$3";
+    trans_res="$(echo "$TEXT" | $SED 's/^\/translate_.._.. //' | $TRANS "$LANG" -b)";
+    $TELEGRAM_BOT "$trans_res" "$FROM_ID";
+}
+
 function youtube_dl_cancel(){
     FROM_ID="$1";
     PID_YOUTUBE_DL=$(ps aux | $GREP -P 'telegram_youtube_dl.sh' |
@@ -132,6 +141,8 @@ while true; do
             /new_emails) new_emails "$ADMIN" "$FROM_ID";;
             /joke) joke "$FROM_ID";;
             /weather) weather "$FROM_ID";;
+            /translate_en_ru*) translate "$TEXT" "en:ru" "$FROM_ID";;
+            /translate_ru_en*) translate "$TEXT" "ru:en" "$FROM_ID";;
             /youtube_dl_cancel*) youtube_dl_cancel "$FROM_ID";;
             /youtube_dl_list*) $TELEGRAM_YOUTUBE_DL "list" "$TEXT" "$FROM_ID" &;;
             /youtube_dl*) URL="$(echo "$TEXT" | $SED 's/^\/youtube_dl *//g')";
