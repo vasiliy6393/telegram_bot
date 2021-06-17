@@ -1,7 +1,8 @@
 #  AUTHOR: Vasiliy Pogoreliy, vasiliy@pogoreliy.tk 
 
 # Dependences:
-# youtube-dl, cutycapt, jq, wc, rar, curl, iconv, python, net-tools, coreutils
+# youtube-dl, cutycapt, translate-shell, jq, wc, rar, curl, iconv,
+# python, net-tools, coreutils
 
 # INSTALL
 chmod a+x ./*.sh;
