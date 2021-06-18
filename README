@@ -6,7 +6,8 @@
 
 # INSTALL
 chmod a+x ./*.sh;
-cp ./*.sh /bin; # or /usr/bin or /usr/local/bin
+cp ./*.sh /bin; # or /usr/bin or /usr/local/bin;
+cp ./etc/telegram_bot.vars /etc/telegram_bot.vars;
 echo 'TOKEN="YOUR_TOKEN"' > /etc/telegram_bot.conf;
 echo 'CID="YOUR_CID"' >> /etc/telegram_bot.conf;
 touch /var/log/telegram_bot.log;
