@@ -5,11 +5,12 @@
 # python, net-tools, coreutils
 
 # INSTALL
-chmod a+x ./*.sh;
-cp ./*.sh /bin; # or /usr/bin or /usr/local/bin;
-cp ./etc/telegram_bot.vars /etc/telegram_bot.vars;
-echo 'TOKEN="YOUR_TOKEN"' > /etc/telegram_bot.conf;
-echo 'CID="YOUR_CID"' >> /etc/telegram_bot.conf;
-touch /var/log/telegram_bot.log;
-chown YOUR_NAME:YOUR_GROUP /var/log/telegram_bot.log;
+sudo chmod a+x ./*.sh;
+sudo cp ./*.sh /bin; # or /usr/bin or /usr/local/bin;
+sudo cp ./etc/telegram_bot.vars /etc/telegram_bot.vars;
+sudo chmod a+x /etc/telegram_bot.vars;
+echo 'TOKEN="YOUR_TOKEN"' | sudo tee /etc/telegram_bot.conf;
+echo 'CID="YOUR_CID"' | sudo tee -a /etc/telegram_bot.conf;
+sudo touch /var/log/telegram_bot.log;
+sudo chown YOUR_NAME:YOUR_GROUP /var/log/telegram_bot.log;
 # Place telegram_main.sh in autostart with regular (not root) user
