@@ -2,7 +2,7 @@
 
 # Dependences:
 # youtube-dl, cutycapt, translate-shell, jq, wc, rar, curl, iconv,
-# python, net-tools, coreutils
+# python, net-tools, coreutils, urlencode
 
 # INSTALL
 sudo chmod a+x ./*.sh;
